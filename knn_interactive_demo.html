@@ -1,0 +1,569 @@
+
+<style>
+  @import url('://fonts.googleapis.comhttps/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .knn-wrap {
+    font-family: 'DM Sans', sans-serif;
+    padding: 1rem 0;
+    color: var(--color-text-primary);
+  }
+
+  .knn-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .knn-title {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+  }
+
+  .knn-subtitle {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .knn-body {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .canvas-wrap {
+    position: relative;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-background-secondary);
+    cursor: crosshair;
+  }
+
+  #knn-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .panel-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    margin-bottom: 10px;
+  }
+
+  .k-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .k-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    min-width: 36px;
+    color: var(--color-text-primary);
+  }
+
+  .k-desc {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+  }
+
+  input[type=range] {
+    width: 100%;
+  }
+
+  .class-buttons {
+    display: flex;
+    gap: 6px;
+  }
+
+  .class-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border: 1.5px solid transparent;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .class-btn.active {
+    border-color: currentColor;
+  }
+
+  .class-btn-0 { background: #EAF3DE; color: #3B6D11; }
+  .class-btn-0.active { background: #639922; color: white; border-color: #639922; }
+  .class-btn-1 { background: #E6F1FB; color: #185FA5; }
+  .class-btn-1.active { background: #378ADD; color: white; border-color: #378ADD; }
+  .class-btn-2 { background: #FAEEDA; color: #854F0B; }
+  .class-btn-2.active { background: #EF9F27; color: white; border-color: #EF9F27; }
+
+  .mode-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    padding: 7px 6px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    color: var(--color-text-secondary);
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .mode-btn.active {
+    background: var(--color-text-primary);
+    color: var(--color-background-primary);
+    border-color: var(--color-text-primary);
+  }
+
+  .result-box {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    min-height: 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .result-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-tertiary);
+    margin-bottom: 4px;
+  }
+
+  .result-value {
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .stat-item {
+    background: var(--color-background-secondary);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .stat-desc {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+  }
+
+  .legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 5px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .clear-btn {
+    width: 100%;
+    padding: 8px;
+    border: 0.5px solid var(--color-border-secondary);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .clear-btn:hover {
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .hint-text {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .knn-body { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="knn-wrap">
+  <div class="knn-header">
+    <span class="knn-title">K-Nearest Neighbors</span>
+    <span class="knn-subtitle">interactive playground</span>
+  </div>
+
+  <div class="knn-body">
+    <div>
+      <div class="canvas-wrap">
+        <canvas id="knn-canvas" width="560" height="420"></canvas>
+      </div>
+      <p class="hint-text" id="hint-text">Click the canvas to add training points · Switch to Test mode to classify</p>
+    </div>
+
+    <div class="side-panel">
+      <div class="panel-card">
+        <div class="panel-label">K value</div>
+        <div class="k-display">
+          <span class="k-number" id="k-val">3</span>
+          <span class="k-desc">nearest neighbors vote on the class</span>
+        </div>
+        <input type="range" id="k-slider" min="1" max="15" value="3" step="2">
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-label">Mode</div>
+        <div class="mode-buttons">
+          <button class="mode-btn active" id="mode-add" onclick="setMode('add')">+ Add</button>
+          <button class="mode-btn" id="mode-test" onclick="setMode('test')">? Test</button>
+        </div>
+        <div class="panel-label" style="margin-top:8px">Class</div>
+        <div class="class-buttons">
+          <button class="class-btn class-btn-0 active" onclick="setClass(0)">A</button>
+          <button class="class-btn class-btn-1" onclick="setClass(1)">B</button>
+          <button class="class-btn class-btn-2" onclick="setClass(2)">C</button>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-label">Result</div>
+        <div class="result-box" id="result-box" style="background:var(--color-background-secondary)">
+          <div class="result-label">Predicted class</div>
+          <div class="result-value" id="result-value">—</div>
+        </div>
+      </div>
+
+      <div class="panel-card">
+        <div class="panel-label">Dataset</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-desc">total points</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num" id="stat-k" style="color:#378ADD">3</div>
+            <div class="stat-desc">neighbors used</div>
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="legend-row"><div class="legend-dot" style="background:#639922"></div><span id="cnt-0">0 points — Class A</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#378ADD"></div><span id="cnt-1">0 points — Class B</span></div>
+          <div class="legend-row"><div class="legend-dot" style="background:#EF9F27"></div><span id="cnt-2">0 points — Class C</span></div>
+        </div>
+        <button class="clear-btn" onclick="clearCanvas()" style="margin-top:10px">Clear all points</button>
+        <button class="clear-btn" onclick="loadDemo()" style="margin-top:6px">Load demo data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('knn-canvas');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+const COLORS = ['#639922', '#378ADD', '#EF9F27'];
+const LIGHT = ['#EAF3DE', '#E6F1FB', '#FAEEDA'];
+const DARK  = ['#3B6D11', '#185FA5', '#854F0B'];
+const LABELS = ['A','B','C'];
+
+let points = [];
+let testPoint = null;
+let neighbors = [];
+let currentClass = 0;
+let mode = 'add';
+let K = 3;
+let animFrame = null;
+let animProgress = 0;
+let lastResult = null;
+
+document.getElementById('k-slider').addEventListener('input', e => {
+  K = +e.target.value;
+  document.getElementById('k-val').textContent = K;
+  document.getElementById('stat-k').textContent = K;
+  if (testPoint) classify(testPoint.x, testPoint.y);
+  draw();
+});
+
+function setMode(m) {
+  mode = m;
+  document.getElementById('mode-add').classList.toggle('active', m === 'add');
+  document.getElementById('mode-test').classList.toggle('active', m === 'test');
+  document.getElementById('hint-text').textContent =
+    m === 'add'
+      ? 'Click to add training points at selected class'
+      : 'Click anywhere to test classification';
+  if (m === 'add') { testPoint = null; neighbors = []; lastResult = null; document.getElementById('result-value').textContent = '—'; document.getElementById('result-box').style.background = 'var(--color-background-secondary)'; draw(); }
+}
+
+function setClass(c) {
+  currentClass = c;
+  document.querySelectorAll('.class-btn').forEach((b,i) => b.classList.toggle('active', i === c));
+}
+
+function dist(a, b) {
+  return Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2);
+}
+
+function classify(x, y) {
+  if (points.length < 1) return;
+  const sorted = [...points].sort((a,b) => dist({x,y},a) - dist({x,y},b));
+  neighbors = sorted.slice(0, Math.min(K, sorted.length));
+  const votes = [0,0,0];
+  neighbors.forEach(p => votes[p.cls]++);
+  const winner = votes.indexOf(Math.max(...votes));
+  lastResult = winner;
+  document.getElementById('result-value').textContent = `Class ${LABELS[winner]}`;
+  document.getElementById('result-box').style.background = LIGHT[winner];
+  animProgress = 0;
+  if (animFrame) cancelAnimationFrame(animFrame);
+  animateNeighbors();
+}
+
+function animateNeighbors() {
+  animProgress = Math.min(animProgress + 0.05, 1);
+  draw();
+  if (animProgress < 1) animFrame = requestAnimationFrame(animateNeighbors);
+}
+
+function getPixel(canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = W / rect.width;
+  const scaleY = H / rect.height;
+  return {
+    x: (e.clientX - rect.left) * scaleX,
+    y: (e.clientY - rect.top) * scaleY
+  };
+}
+
+canvas.addEventListener('click', e => {
+  const {x, y} = getPixel(canvas, e);
+  if (mode === 'add') {
+    points.push({x, y, cls: currentClass});
+    updateStats();
+    draw();
+  } else {
+    testPoint = {x, y};
+    classify(x, y);
+  }
+});
+
+function updateStats() {
+  document.getElementById('stat-total').textContent = points.length;
+  [0,1,2].forEach(i => {
+    const c = points.filter(p => p.cls === i).length;
+    document.getElementById(`cnt-${i}`).textContent = `${c} point${c !== 1 ? 's' : ''} — Class ${LABELS[i]}`;
+  });
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(128,128,128,0.08)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+  for (let y = 0; y <= H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+
+  // Decision boundary (simplified Voronoi preview using grid sampling)
+  if (points.length >= 2) {
+    const step = 14;
+    for (let gx = 0; gx < W; gx += step) {
+      for (let gy = 0; gy < H; gy += step) {
+        const sorted = [...points].sort((a,b) => dist({x:gx,y:gy},a) - dist({x:gx,y:gy},b));
+        const kn = sorted.slice(0, Math.min(K, sorted.length));
+        const votes = [0,0,0];
+        kn.forEach(p => votes[p.cls]++);
+        const w = votes.indexOf(Math.max(...votes));
+        ctx.fillStyle = LIGHT[w] + '88';
+        ctx.fillRect(gx, gy, step, step);
+      }
+    }
+  }
+
+  // Neighbor lines
+  if (testPoint && neighbors.length > 0) {
+    neighbors.forEach((n, i) => {
+      const t = Math.min(animProgress * (neighbors.length / (i + 1)), 1);
+      const ex = testPoint.x + (n.x - testPoint.x) * t;
+      const ey = testPoint.y + (n.y - testPoint.y) * t;
+      ctx.beginPath();
+      ctx.moveTo(testPoint.x, testPoint.y);
+      ctx.lineTo(ex, ey);
+      ctx.strokeStyle = COLORS[n.cls] + 'BB';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Radius circle
+    if (neighbors.length > 0 && animProgress > 0.7) {
+      const maxR = dist(testPoint, neighbors[neighbors.length - 1]);
+      ctx.beginPath();
+      ctx.arc(testPoint.x, testPoint.y, maxR, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(128,128,128,0.25)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  // Highlight neighbors
+  if (neighbors.length > 0 && animProgress > 0.4) {
+    neighbors.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 11, 0, Math.PI * 2);
+      ctx.strokeStyle = COLORS[n.cls];
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
+
+  // Training points
+  points.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS[p.cls];
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // Test point
+  if (testPoint && lastResult !== null) {
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(testPoint.x, testPoint.y, 14, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS[lastResult] + '33';
+    ctx.fill();
+    ctx.strokeStyle = COLORS[lastResult];
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Inner dot (question mark shape)
+    ctx.beginPath();
+    ctx.arc(testPoint.x, testPoint.y, 7, 0, Math.PI * 2);
+    ctx.fillStyle = COLORS[lastResult];
+    ctx.fill();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 9px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', testPoint.x, testPoint.y);
+  }
+
+  // Axes labels
+  ctx.fillStyle = 'rgba(128,128,128,0.35)';
+  ctx.font = '11px DM Sans, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('Feature 1 →', 10, H - 8);
+  ctx.save();
+  ctx.translate(14, H - 30);
+  ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'left';
+  ctx.fillText('Feature 2 →', 0, 0);
+  ctx.restore();
+}
+
+function clearCanvas() {
+  points = [];
+  testPoint = null;
+  neighbors = [];
+  lastResult = null;
+  animProgress = 0;
+  document.getElementById('result-value').textContent = '—';
+  document.getElementById('result-box').style.background = 'var(--color-background-secondary)';
+  updateStats();
+  draw();
+}
+
+function loadDemo() {
+  clearCanvas();
+  const clusters = [
+    {cls:0, cx:140, cy:120, n:14},
+    {cls:0, cx:200, cy:200, n:8},
+    {cls:1, cx:380, cy:130, n:14},
+    {cls:1, cx:340, cy:220, n:8},
+    {cls:2, cx:250, cy:320, n:14},
+    {cls:2, cx:160, cy:330, n:6},
+  ];
+  clusters.forEach(c => {
+    for (let i = 0; i < c.n; i++) {
+      points.push({
+        x: c.cx + (Math.random() - 0.5) * 90,
+        y: c.cy + (Math.random() - 0.5) * 90,
+        cls: c.cls
+      });
+    }
+  });
+  updateStats();
+  draw();
+}
+
+// Init
+draw();
+</script>

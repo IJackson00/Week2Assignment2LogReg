@@ -1,0 +1,1 @@
+Name: Ian Jackson Date: 03/23/2026 Message: This is my first "GitHub Commit" file for precessing. However, I am recommiting to comprehending this assignment. There are a few assumptions, and terminologies that may facilitate a sense of confusion while following the instructions. This is another attempt.
